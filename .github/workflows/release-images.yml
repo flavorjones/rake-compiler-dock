@@ -11,6 +11,10 @@ on:
       tag:
         description: "Tag name to release"
         required: true
+      container_registry:
+        description: "Container registry to push to"
+        required: false
+        default: "ghcr.io/rake-compiler"
 
 
 
@@ -889,6 +893,7 @@ jobs:
       - name: Use cache and push docker image
         env:
           RCD_IMAGE_VERSION: snapshot
+          CONTAINER_REGISTRY: ${{ inputs.container_registry }}
           RCD_DOCKER_BUILD: docker buildx build --cache-from=type=local,compression=zstd,src=tmp/build-cache-X64 --cache-from=type=local,compression=zstd,src=tmp/build-cache-ARM64
           RCD_TASK_DEPENDENCIES: "false"
         run: |

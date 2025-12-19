@@ -11,11 +11,20 @@ on:
       tag:
         description: "Tag name to release"
         required: true
+      container_registry:
+        description: "Container registry to push to"
+        required: false
+        default: "ghcr.io/rake-compiler"
 
 <% else %>
 name: Weekly publish docker images to GHCR
 on:
   workflow_dispatch:
+    inputs:
+      container_registry:
+        description: "Container registry to push to"
+        required: false
+        default: "ghcr.io/rake-compiler"
   schedule:
     - cron: "0 3 * * 3" # At 03:00 on Wednesday # https://crontab.guru/#0_3_*_*_3
 <% end %>
@@ -114,6 +123,7 @@ jobs:
       - name: Use cache and push docker image
         env:
           RCD_IMAGE_VERSION: snapshot
+          CONTAINER_REGISTRY: ${{ inputs.container_registry }}
           RCD_DOCKER_BUILD: docker buildx build --cache-from=type=local,compression=zstd,src=tmp/build-cache-X64 --cache-from=type=local,compression=zstd,src=tmp/build-cache-ARM64
           RCD_TASK_DEPENDENCIES: "false"
         run: |
